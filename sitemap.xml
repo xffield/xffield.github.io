@@ -4,17 +4,43 @@
   
   <url>
     <loc>/categories/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/tags/hugo/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/categories/ssr/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/tags/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/</loc>
+    <lastmod>2019-04-27T17:41:11+08:00</lastmod>
   </url>
   
 </urlset>

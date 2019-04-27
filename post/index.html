@@ -2,18 +2,18 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>404 Page not found - 今晚打老虎</title>
+  <title>Posts - 今晚打老虎</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
   
-  <meta name="description" content="404 Page not found">
+  <meta name="description" content="Posts">
   
-  <meta itemprop="name" content="404 Page not found - 今晚打老虎">
-  <meta itemprop="description" content="404 Page not found">
+  <meta itemprop="name" content="Posts - 今晚打老虎">
+  <meta itemprop="description" content="Posts">
   <meta itemprop="image" content="/img/author.jpg">
   
   
   <meta name="twitter:description" content="">
-  
+  <link rel="alternate" href="/feed.xml" title="今晚打老虎" type="application/rss+xml"/>
   <link rel="shortcut icon" href="/img/favicon.ico"/>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png" />
@@ -56,7 +56,17 @@
   <div id="container">
     <div id="main">
       
-      你访问的页面不存在
+      <h2 id="2019-04">2019-04</h2>
+      
+      <section class="post" itemscope itemprop="blogPost">
+    <a href="/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/" title="用Hugo搭建个人Blog" itemprop="url">
+    <h1 itemprop="name">用Hugo搭建个人Blog</h1>
+    <p itemprop="description">以往写博客没坚持下来，除了主观原因外，客观上也有工具不太给力、更新维护不方便的原因。一直有看到在github上维护自己博客的，今天也整一下。</p>
+    <time datetime="2019-04-27 17:41:11 &#43;0800 CST" itemprop="datePublished">2019年04月27日</time>
+  </a>
+</section>
+
+      
       
     </div>
     <div class="openaside"><a class="navbutton" href="#" title="显示侧边栏"></a></div>
@@ -118,6 +128,10 @@
 
 
   
+<div class="rsspart">
+  <a rel="nofollow" href="/feed.xml" type="application/rss+xml" target="_blank">RSS 订阅</a>
+</div>
+
 
 </aside>
 </div>
@@ -206,6 +220,38 @@ $(document).ready(function(){
 
 <script type="text/javascript">
 $(document).ready(function(){
+  var ai = $('.article-content>iframe'),
+      ae = $('.article-content>embed'),
+      t  = $('#toc'),
+      h  = $('article h2')
+      ah = $('article h2'),
+      ta = $('#toc.toc-aside'),
+      o  = $('.openaside'),
+      c  = $('.closeaside');
+  if(ai.length>0){
+    ai.wrap('<div class="video-container" />');
+  };
+  if(ae.length>0){
+   ae.wrap('<div class="video-container" />');
+  };
+  if(ah.length==0){
+    t.css('display','none');
+  }else{
+    c.click(function(){
+      ta.css('display', 'block').addClass('fadeIn');
+    });
+    o.click(function(){
+      ta.css('display', 'none');
+    });
+    $(window).scroll(function(){
+      ta.css("top",Math.max(140,320-$(this).scrollTop()));
+    });
+  };
+});
+</script>
+
+<script type="text/javascript">
+$(document).ready(function(){
   var $this = $('.share'),
       url = $this.attr('data-url'),
       encodedUrl = encodeURIComponent(url),
@@ -232,6 +278,27 @@ $(document).ready(function(){
 });
 </script>
 
+
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.css" media="screen" type="text/css">
+<script src="/fancybox/jquery.fancybox.pack.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+  $('.article-content').each(function(i){
+    $(this).find('img').each(function(){
+      if ($(this).parent().hasClass('fancybox')) return;
+      var alt = this.alt;
+      if (alt) $(this).after('<span class="caption">' + alt + '</span>');
+      $(this).wrap('<a href="' + this.src + '" title="' + alt + '" class="fancybox"></a>');
+    });
+    $(this).find('.fancybox').each(function(){
+      $(this).attr('rel', 'article' + i);
+    });
+  });
+  if($.fancybox){
+    $('.fancybox').fancybox();
+  }
+});
+</script>
 
 
 
