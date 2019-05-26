@@ -1,24 +1,15 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on 今晚打老虎</title>
-    <link>/post/</link>
-    <description>Recent content in Posts on 今晚打老虎</description>
+    <title>tools on 今晚打老虎</title>
+    <link>/categories/tools/</link>
+    <description>Recent content in tools on 今晚打老虎</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 14 May 2019 00:06:54 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 06 May 2019 21:42:46 +0800</lastBuildDate>
     
-	<atom:link href="/post/feed.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/categories/tools/feed.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Obervable VS Promise</title>
-      <link>/post/2019/05/observable-promise/</link>
-      <pubDate>Tue, 14 May 2019 00:06:54 +0800</pubDate>
-      
-      <guid>/post/2019/05/observable-promise/</guid>
-      <description>入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv</description>
-    </item>
     
     <item>
       <title>Macbook最全入门-前言</title>

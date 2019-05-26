@@ -6,17 +6,17 @@
     <description>Recent content in Categories on 今晚打老虎</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Sat, 27 Apr 2019 17:41:11 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 06 May 2019 21:42:46 +0800</lastBuildDate>
     
 	<atom:link href="/categories/feed.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>SSR</title>
-      <link>/categories/ssr/</link>
-      <pubDate>Sat, 27 Apr 2019 17:41:11 +0800</pubDate>
+      <title>tools</title>
+      <link>/categories/tools/</link>
+      <pubDate>Mon, 06 May 2019 21:42:46 +0800</pubDate>
       
-      <guid>/categories/ssr/</guid>
+      <guid>/categories/tools/</guid>
       <description></description>
     </item>
     

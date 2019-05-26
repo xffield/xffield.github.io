@@ -2,16 +2,17 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>用Hugo搭建个人Blog - 今晚打老虎</title>
+  <title>Obervable VS Promise - 今晚打老虎</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
   
-  <meta name="description" content="Hugo构建站点发布到github，travis自动构建">
+  <meta name="description" content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv">
   
-  <meta itemprop="name" content="用Hugo搭建个人Blog - 今晚打老虎">
-  <meta itemprop="description" content="Hugo构建站点发布到github，travis自动构建">
+  <meta itemprop="name" content="Obervable VS Promise - 今晚打老虎">
+  <meta itemprop="description" content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv">
   <meta itemprop="image" content="/img/author.jpg">
   
-  <meta name="twitter:description" content="Hugo构建站点发布到github，travis自动构建" />
+  
+  <meta name="twitter:description" content="">
   
   <link rel="shortcut icon" href="/img/favicon.ico"/>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -57,7 +58,7 @@
 	<article itemprop="articleBody">
     <header class="article-info clearfix">
   <h1 itemprop="name">
-      <a href="/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/" title="用Hugo搭建个人Blog" itemprop="url">用Hugo搭建个人Blog</a>
+      <a href="/post/2019/05/observable-promise/" title="Obervable VS Promise" itemprop="url">Obervable VS Promise</a>
   </h1>
   <p class="article-author">By
     
@@ -65,7 +66,7 @@
     
   </p>
   <p class="article-time">
-    <time datetime="2019-04-27 17:41:11 &#43;0800 CST" itemprop="datePublished">2019年04月27日</time>
+    <time datetime="2019-05-14 00:06:54 &#43;0800 CST" itemprop="datePublished">2019年05月14日</time>
   </p>
 </header>
 
@@ -77,13 +78,16 @@
 <ul>
 <li>
 <ul>
-<li><a href="#需求分析">需求分析</a></li>
-<li><a href="#jekyll-hexo-hugo怎么选">jekyll、hexo、hugo怎么选？</a></li>
-<li><a href="#配置-github">配置 github</a></li>
-<li><a href="#配置-travis-自动构建">配置 travis 自动构建</a></li>
-<li><a href="#hugo配置与美化">hugo配置与美化</a></li>
-<li><a href="#参考链接">参考链接</a></li>
-<li><a href="#一些好看的博客">一些好看的博客</a></li>
+<li><a href="#obervable-懒执行-promise-立即执行">Obervable 懒执行 Promise 立即执行</a></li>
+<li><a href="#obervable-可能同步-promise-一直异步">Obervable 可能同步 Promise 一直异步</a></li>
+<li><a href="#observable-数据流-与-promise-一个承诺">Observable 数据流 与 Promise 一个承诺</a></li>
+<li><a href="#observable-可取消-与-promise-不可取消">Observable 可取消 与 Promise 不可取消</a></li>
+<li><a href="#其他">其他</a>
+<ul>
+<li><a href="#错误处理">错误处理</a></li>
+<li><a href="#finally">finally</a></li>
+</ul></li>
+<li><a href="#总结">总结</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -91,130 +95,213 @@
     
     
 
-<p>以往写博客没坚持下来，除了主观原因外，客观上也有工具不太给力、更新维护不方便的原因。一直有看到在github上维护自己博客的，今天也整一下。</p>
+<blockquote>
+<p>入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Obervable）与之前一直使用 Promise 进行一些比较。</p>
+</blockquote>
 
-<p>博客更多是自己的总结，写作是第一位；美观是写作的动力，也是更好的阅读体验；文章写得多，检索分类总是少不了；还有读者互动、多平台发布。</p>
+<p>Obervable 和 Promise 都是进行异步处理的利器，本文将两者的差异进行比较，以巩固两边的知识点。</p>
 
-<h2 id="需求分析">需求分析</h2>
+<h2 id="obervable-懒执行-promise-立即执行">Obervable 懒执行 Promise 立即执行</h2>
 
-<ul>
-<li>写作方便
+<p>从创建 Obervable 和 Promise 开始，两者就有差异。前者每次订阅时执行 subscribe 函数，后者创建实例时执行 executor  函数 。</p>
 
-<ul>
-<li>Markdown 书写</li>
-<li>Math，Flow支持</li>
-<li>更新维护方便</li>
-</ul></li>
-<li>界面美观
+<pre><code class="language-javascript">// init promise
+new Promise(resolve =&gt; {
+    console.log('init promise')
+    resolve(7);
+})
+// 7
+// 7 
+setTimeout(() =&gt; {
+    promise.then(num =&gt; console.log(num))
+    promise.then(num =&gt; console.log(num))
+}, 2000)
+</code></pre>
 
-<ul>
-<li>布局美观</li>
-<li>代码高亮</li>
-</ul></li>
-<li>方便管理
+<pre><code class="language-javascript">const observable$ = new Observable(observer =&gt; {
+    console.log('init observable')
+    observer.next(7)
+})
+// init observable
+// 7
+// init observable
+// 7
+setTimeout(() =&gt; {
+    observable$.subscribe(num =&gt; console.log(num))
+    observable$.subscribe(num =&gt; console.log(num))
+}, 2000)
+</code></pre>
 
-<ul>
-<li>文章分类</li>
-<li>标签</li>
-<li>搜索</li>
-<li>站点分析</li>
-</ul></li>
-<li>读者互动
+<h2 id="obervable-可能同步-promise-一直异步">Obervable 可能同步 Promise 一直异步</h2>
 
-<ul>
-<li>留言</li>
-<li>点赞</li>
-<li>打赏</li>
-<li>分享</li>
-</ul></li>
-<li>多平台发布</li>
-</ul>
+<p>Obervable 在 subscribe 函数执行过程中如果有值被 <code>next</code> 出来，后续的订阅将会同步执行。Promise 则不回，它是<strong>异步</strong>任务的一种。</p>
 
-<h2 id="jekyll-hexo-hugo怎么选">jekyll、hexo、hugo怎么选？</h2>
+<pre><code class="language-javascript">// before observable.
+// 7
+// after observable.
+console.log('before observable.')
+const observable$ = new Observable(observer =&gt; {
+    observer.next(7)
+})
+observable$.subscribe(num =&gt; console.log(num))
+console.log('after observable.')
+</code></pre>
 
-<ul>
-<li><a href="https://jekyllrb.com/">jekyll</a> 使用 ruby 编写 <img src="https://img.shields.io/github/stars/jekyll/jekyll.svg?style=social" alt="GitHub stars" />
+<pre><code class="language-javascript">// before promise.
+// after promise.
+// 1
+console.log('before promise.')
+const promise = new Promise(resolve =&gt; {
+    resolve(1)
+})
+promise.then(res =&gt; console.log(res))
+console.log('after promise.')
+</code></pre>
 
-<ul>
-<li>优点：github官方集成，老牌工具生态主题多</li>
-<li>缺点：构建较慢</li>
-</ul></li>
-<li><a href="https://hexo.io/">hexo </a> 使用 nodejs 编写 <img src="https://img.shields.io/github/stars/hexojs/hexo.svg?style=social" alt="GitHub stars" />
+<p>不过 Promise 配合上 <code>async</code> <code>await</code> 也可以模拟同步，但 Promise 本身是一种<strong>微任务</strong>。</p>
 
-<ul>
-<li>优点：nodejs 对前端友好，主题较多，构建速度介于 hugo 和 jekyll 之间</li>
-<li>缺点：没有喜欢的主题，看到 <code>node_module</code> 就头大</li>
-</ul></li>
-<li><a href="https://gohugo.io/">hugo</a> 使用 go 编写 <img src="https://img.shields.io/github/stars/gohugoio/hugo.svg?style=social" alt="GitHub stars" />
+<pre><code class="language-javascript">function somePromise() {
+  return new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve('resolved');
+    }, 2000);
+  });
+}
 
-<ul>
-<li>优点：构建速度快</li>
-<li>缺点：主题少</li>
-</ul></li>
-</ul>
+async function asyncCall() {
+  console.log('calling');
+  var result = await somePromise();
+  console.log(result);
+}
+// calling
+// resolved
+asyncCall();
+</code></pre>
 
-<p>hugo性能好、有喜欢的主题、对go也有兴趣，就选它了，按照官方教程把网站搭好。现在网站还很丑，以后有时间再优化，先完成今天的目标。</p>
+<h2 id="observable-数据流-与-promise-一个承诺">Observable 数据流 与 Promise 一个承诺</h2>
 
-<h2 id="配置-github">配置 github</h2>
+<p>Observable 会向订阅者持续不断的输出最新值，Promise <code>resolve()</code>之后不会再改变它的值。</p>
 
-<ul>
-<li>创建 repository <code>username</code>.github.io</li>
-<li><code>git submodule add {username}.github.io.git public</code></li>
-<li><code>hugo</code></li>
-<li><code>git commit</code></li>
-</ul>
+<pre><code class="language-javascript">const observable$ = new Observable(observer =&gt; {
+    let i = 0
+    const handle = setInterval(() =&gt; {
+        i++
+        observer.next(i)
+        if (i &gt;= 3) clearInterval(handle)
+    }, 1000)
+})
+// 1
+// 2
+// 3
+observable$.subscribe(num =&gt; console.log(num))
+</code></pre>
 
-<h2 id="配置-travis-自动构建">配置 travis 自动构建</h2>
+<pre><code class="language-javascript">const promise = new Promise(resolve =&gt; {
+    resolve(7);
+    resolve(9);
+})
+// 7 
+promise.then(num =&gt; console.log(num))
+</code></pre>
 
-<p>待续</p>
+<p>因为 Observable 会源源不断提供新的值，所以在不需要获取新值的时候一定要<strong>取消订阅</strong></p>
 
-<h2 id="hugo配置与美化">hugo配置与美化</h2>
+<h2 id="observable-可取消-与-promise-不可取消">Observable 可取消 与 Promise 不可取消</h2>
 
-<p>待续</p>
+<p>原生的 Promise 未提供取消的 API。在现在这种大量使用组件化的时代，这点确实挺不方便的。</p>
 
-<h2 id="参考链接">参考链接</h2>
+<pre><code class="language-javascript">const observable$ = new Observable(observer =&gt; {
+    let i = 0
+    const handle = setInterval(() =&gt; {
+        i++
+        observer.next(i)
+        if (i &gt;= 3) clearInterval(handle)
+    }, 1000)
+})
+const subscription = observable$.subscribe(num =&gt; console.log(num))
+// 1
+setTimeout(() =&gt; {
+    subscription.unsubscribe();
+}, 1500);
+</code></pre>
 
-<p><a href="https://www.simongong.net/xuan-ze-kun-nan-zheng/">开源静态博客生成器——jekyll、hexo、hugo怎么选？</a></p>
+<p>Promise <code>then()</code> 返回一个 Promise ，可以链式操作对结果进行一些加工。</p>
 
-<p><a href="https://stackshare.io/stackups/hexo-vs-hugo_2-vs-jekyll">Jekyll vs. Hugo vs. Hexo</a></p>
+<pre><code class="language-javascript">const promise = new Promise(resolve =&gt; resolve(1))
+const promiseThen = promise.then(result =&gt; console.log(result))
+//true
+console.log(promiseThen instanceof Promise)
 
-<h2 id="一些好看的博客">一些好看的博客</h2>
+const promise1 = new Promise(res=&gt;{
+	res([1,2,3])
+})
+// [4,6]
+promise1
+	.then(res=&gt;res.filter(item=&gt;item&gt;1))
+  .then(res=&gt;res.map(item=&gt;item*2))
+  .then(res=&gt;console.log(res))
+</code></pre>
 
-<p><a href="http://joselynzhao.top/">http://joselynzhao.top/</a></p>
+<h2 id="其他">其他</h2>
 
-<p><a href="http://blog.yeshuanova.com/">http://blog.yeshuanova.com/</a></p>
+<h3 id="错误处理">错误处理</h3>
 
-<p><a href="https://cythilya.github.io/">https://cythilya.github.io/</a></p>
+<pre><code class="language-javascript">const promise1 = new Promise(res=&gt;{
+	throw new Error('出错了')
+})
+promise1.then().catch(err=&gt;console.log(err))
+</code></pre>
 
-<p><a href="https://blog.olowolo.com/">https://blog.olowolo.com/</a></p>
+<pre><code class="language-javascript">const bs=new Rx.BehaviorSubject(1)
+const obs=bs.asObservable()
+obs.subscribe(
+	res=&gt;console.log(res),
+	err=&gt;console.error(err)
+)
+bs.error('出错了') //subscribe将会结束
+</code></pre>
+
+<h3 id="finally">finally</h3>
+
+<pre><code class="language-javascript">promise
+.then(result =&gt; {
+  //···
+})
+.catch(error =&gt; {
+  //···
+})
+.finally(() =&gt; {
+  //···
+});
+</code></pre>
+
+<pre><code class="language-javascript">var obs = Rx.Observable.of(1)
+  .finally(function () { console.log('Finally'); }); //completed才会执行finally
+  
+obs
+.subscribe(
+	res=&gt;console.log(res),
+	err=&gt;console.error(err)
+)
+</code></pre>
+
+<h2 id="总结">总结</h2>
+
+<p>根据笔者自己的使用体验，RxJS 有强大的操作符，语义表达很好，写出来的代码可读性很强。Promise 原生支持，微任务的执行机制不会影响主线程，不能 cancellable 用起来就挺不方便了。抛开原生异步任务这点不说，Promise 能干的  RxJS 都能干，大部分的异步场景推荐 RxJS 。</p>
 
     
 	</div>
   <footer class="article-footer clearfix">
   
 
-<div class="article-tags">
-  <span></span>
-  
-  <a href="/tags/hugo">Hugo</a>
-  
-</div>
 
 
 
-
-
-<div class="article-categories">
-  <span></span>
-  
-  <a class="article-category-link" href="/categories/tools">tools</a>
-  
-</div>
 
 
 
   <div class="article-share" id="share">
-    <div data-url="/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/" data-title="用Hugo搭建个人Blog" data-tsina="" class="share clearfix">
+    <div data-url="/post/2019/05/observable-promise/" data-title="Obervable VS Promise" data-tsina="" class="share clearfix">
     </div>
   </div>
 </footer>
@@ -236,8 +323,8 @@
 
 
 var disqus_config = function () {
-this.page.url = "/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/";
-this.page.identifier = "/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/";
+this.page.url = "/post/2019/05/observable-promise/";
+this.page.identifier = "/post/2019/05/observable-promise/";
 };
 (function() { 
 var d = document, s = d.createElement('script');
