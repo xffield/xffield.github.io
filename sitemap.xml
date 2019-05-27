@@ -3,20 +3,25 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/post/2019/05/observable-promise/</loc>
-    <lastmod>2019-05-14T00:06:54+08:00</lastmod>
+    <loc>/post/</loc>
+    <lastmod>2019-05-27T19:57:56+08:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2019-05-14T00:06:54+08:00</lastmod>
-    <priority>0</priority>
+    <loc>/post/2019/05/typescript%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B501/</loc>
+    <lastmod>2019-05-27T19:57:56+08:00</lastmod>
   </url>
   
   <url>
     <loc>/</loc>
-    <lastmod>2019-05-14T00:06:54+08:00</lastmod>
+    <lastmod>2019-05-27T19:57:56+08:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/post/2019/05/observable-promise/</loc>
+    <lastmod>2019-05-14T00:06:54+08:00</lastmod>
   </url>
   
   <url>

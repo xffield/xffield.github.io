@@ -6,10 +6,19 @@
     <description>Recent content on 今晚打老虎</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>zh-CN</language>
-    <lastBuildDate>Tue, 14 May 2019 00:06:54 +0800</lastBuildDate>
+    <lastBuildDate>Mon, 27 May 2019 19:57:56 +0800</lastBuildDate>
     
 	<atom:link href="/feed.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Typescript最佳实践（一）</title>
+      <link>/post/2019/05/typescript%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B501/</link>
+      <pubDate>Mon, 27 May 2019 19:57:56 +0800</pubDate>
+      
+      <guid>/post/2019/05/typescript%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B501/</guid>
+      <description>TypeScript — JavaScript的超集 尝了 typescript 的甜头之后，JavaScript 已经回不去了。没办法，真的太香了。 TypeScript 是 Microsoft 开发的开源项目，是 JavaScript 的超集，提供</description>
+    </item>
     
     <item>
       <title>Obervable VS Promise</title>
