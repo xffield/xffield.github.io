@@ -2,16 +2,17 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>用Hugo搭建个人Blog - 今晚打老虎</title>
+  <title>RxJS重试之retry、retryWhen、catchError、repeat、repeatWhen - 今晚打老虎</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3, minimum-scale=1">
   
-  <meta name="description" content="Hugo构建站点发布到github，travis自动构建">
+  <meta name="description" content="最近处理业务时，在符合某种条件的情况下需要进行一次请求重发。RxJS 能够实现重试的操作符有 3 种： retry retryWhen catchError retry、retryWhen、cat">
   
-  <meta itemprop="name" content="用Hugo搭建个人Blog - 今晚打老虎">
-  <meta itemprop="description" content="Hugo构建站点发布到github，travis自动构建">
+  <meta itemprop="name" content="RxJS重试之retry、retryWhen、catchError、repeat、repeatWhen - 今晚打老虎">
+  <meta itemprop="description" content="最近处理业务时，在符合某种条件的情况下需要进行一次请求重发。RxJS 能够实现重试的操作符有 3 种： retry retryWhen catchError retry、retryWhen、cat">
   <meta itemprop="image" content="/img/author.jpg">
   
-  <meta name="twitter:description" content="Hugo构建站点发布到github，travis自动构建" />
+  
+  <meta name="twitter:description" content="">
   
   <link rel="shortcut icon" href="/img/favicon.ico"/>
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
@@ -57,7 +58,7 @@
 	<article itemprop="articleBody">
     <header class="article-info clearfix">
   <h1 itemprop="name">
-      <a href="/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/" title="用Hugo搭建个人Blog" itemprop="url">用Hugo搭建个人Blog</a>
+      <a href="/post/2019/06/rxjs%E9%87%8D%E8%AF%95/" title="RxJS重试之retry、retryWhen、catchError、repeat、repeatWhen" itemprop="url">RxJS重试之retry、retryWhen、catchError、repeat、repeatWhen</a>
   </h1>
   <p class="article-author">By
     
@@ -65,7 +66,7 @@
     
   </p>
   <p class="article-time">
-    <time datetime="2019-04-27 17:41:11 &#43;0800 CST" itemprop="datePublished">2019年04月27日</time>
+    <time datetime="2019-06-01 10:19:58 &#43;0800 CST" itemprop="datePublished">2019年06月01日</time>
   </p>
 </header>
 
@@ -77,13 +78,17 @@
 <ul>
 <li>
 <ul>
-<li><a href="#需求分析">需求分析</a></li>
-<li><a href="#jekyll-hexo-hugo怎么选">jekyll、hexo、hugo怎么选？</a></li>
-<li><a href="#配置-github">配置 github</a></li>
-<li><a href="#配置-travis-自动构建">配置 travis 自动构建</a></li>
-<li><a href="#hugo配置与美化">hugo配置与美化</a></li>
+<li><a href="#准备工作">准备工作</a></li>
+<li><a href="#操作符">操作符</a>
+<ul>
+<li><a href="#repeat">repeat</a></li>
+<li><a href="#repeatwhen">repeatWhen</a></li>
+<li><a href="#retry">retry</a></li>
+<li><a href="#retrywhen">retryWhen</a></li>
+<li><a href="#catcherror-catch">catchError/catch</a></li>
+</ul></li>
+<li><a href="#retry-源码">retry 源码</a></li>
 <li><a href="#参考链接">参考链接</a></li>
-<li><a href="#一些好看的博客">一些好看的博客</a></li>
 </ul></li>
 </ul>
 </nav>
@@ -91,130 +96,268 @@
     
     
 
-<p>以往写博客没坚持下来，除了主观原因外，客观上也有工具不太给力、更新维护不方便的原因。一直有看到在github上维护自己博客的，今天也整一下。</p>
-
-<p>博客更多是自己的总结，写作是第一位；美观是写作的动力，也是更好的阅读体验；文章写得多，检索分类总是少不了；还有读者互动、多平台发布。</p>
-
-<h2 id="需求分析">需求分析</h2>
+<p>最近处理业务时，在符合某种条件的情况下需要进行一次请求重发。RxJS 能够实现重试的操作符有 3 种：</p>
 
 <ul>
-<li>写作方便
-
-<ul>
-<li>Markdown 书写</li>
-<li>Math，Flow支持</li>
-<li>更新维护方便</li>
-</ul></li>
-<li>界面美观
-
-<ul>
-<li>布局美观</li>
-<li>代码高亮</li>
-</ul></li>
-<li>方便管理
-
-<ul>
-<li>文章分类</li>
-<li>标签</li>
-<li>搜索</li>
-<li>站点分析</li>
-</ul></li>
-<li>读者互动
-
-<ul>
-<li>留言</li>
-<li>点赞</li>
-<li>打赏</li>
-<li>分享</li>
-</ul></li>
-<li>多平台发布</li>
+<li>retry</li>
+<li>retryWhen</li>
+<li>catchError</li>
 </ul>
 
-<h2 id="jekyll-hexo-hugo怎么选">jekyll、hexo、hugo怎么选？</h2>
+<p><code>retry</code>、<code>retryWhen</code>、<code>catchError</code> 都属于 Error Handling 的操作符，通过<strong>捕获异常</strong>来实现重试。此外还有两个操作符 <code>repeat</code> ，<code>repeatWhen</code> 能够执行重复操作，下面对这 5 个操作符进行一波实战。</p>
+
+<h2 id="准备工作">准备工作</h2>
+
+<p>简单实现一个请求函数，模拟调用接口。 <a href="https://github.com/angular/angular/blob/master/packages/http/src/backends/xhr_backend.ts">点击查看Angular HttpClient 的实现</a></p>
+
+<pre><code class="language-ts">import { Observable, Observer } from &quot;rxjs&quot;;
+
+export const SUCCESS = 200
+export const quest = (param: { code: number }) =&gt; {
+    return new Observable&lt;string&gt;((observer: Observer&lt;string&gt;) =&gt; {
+        log('questing')
+        setTimeout(() =&gt; {
+            if (param.code === SUCCESS) {
+                observer.next('ok')
+                observer.complete()
+            } else {
+                observer.error('error')
+            }
+        }, 2000)
+    })
+}
+</code></pre>
+
+<p>以及 log 函数</p>
+
+<pre><code class="language-ts">export const log = function (...args: any[]) {
+    console.log.apply(console, args)
+}
+export const logCompleted = () =&gt; {
+    log('completed')
+}
+</code></pre>
+
+<h2 id="操作符">操作符</h2>
+
+<h3 id="repeat">repeat</h3>
+
+<pre><code class="language-ts">public repeat(count: number): Observable
+</code></pre>
+
+<p>重复 <code>count</code> 次由源 Observable 所发出的项的流。<a href="https://cn.rx.js.org/class/es6/Observable.js~Observable.html#instance-method-repeat">官方文档</a></p>
+
+<pre><code class="language-ts">const param = {code:200}
+quest(param)
+    .pipe(
+        repeat(2)
+    )
+    .subscribe(log, log,logCompleted) 
+
+// 执行结果：
+// questing
+// ok
+// questing
+// ok
+// completed
+</code></pre>
+
+<p>值得注意一下的是，当全部的 repeat 执行完之后 Observable 变为 completed，尽管在 <code>quest</code> 中 <code>observer.complete()</code> 是紧跟着 <code>observer.next('ok')</code>  之后的。</p>
+
+<p>如果 <code>count</code> 为0则产生一个空的 Observable （立即完成的 observable）。</p>
+
+<h3 id="repeatwhen">repeatWhen</h3>
+
+<pre><code class="language-ts">public repeatWhen(notifier: function(notifications: Observable): Observable): Observable
+</code></pre>
+
+<p>根据 <code>notifier</code> 返回的 Observable 来决定是否重复。 <a href="https://cn.rx.js.org/class/es6/Observable.js~Observable.html#instance-method-repeatWhen">官方文档</a></p>
+
+<pre><code class="language-ts">// 模拟出 repeat 效果
+const param = {code:200}
+quest(param)
+    .pipe(
+        repeatWhen(result$ =&gt; result$.pipe( //result$ 
+            scan(count=&gt;{
+              return count + 1
+            },0),
+            takeWhile(count =&gt; {
+              return count &lt; 2 
+            })
+          	
+        ))
+    )
+    .subscribe(log,log,logCompleted)
+// 执行结果：
+// questing
+// ok
+// questing
+// ok
+// completed
+</code></pre>
+
+<p><code>repeatWhen</code> 必然会执行 1 次。看下 notifications 出现错误时的输出结果。</p>
+
+<pre><code class="language-ts">quest(param)
+  .pipe(
+  repeatWhen(result$ =&gt; result$.pipe(
+      tap( _=&gt;{
+        throw 'repeatWhen error'
+      })
+    )) 
+  )
+  .subscribe(log,log,logCompleted)
+// questing
+// ok
+// repeatWhen error
+</code></pre>
+
+<h3 id="retry">retry</h3>
+
+<pre><code class="language-ts">retry(count: number): Observable
+</code></pre>
+
+<p>返回一个 Observable， 该 Observable 是源 Observable 不包含错误异常的镜像。 如果源 Observable 发生错误, 这个方法不会传播错误而是会不断的重新订阅源 Observable 直到达到最大重试次数 (由 <code>count</code> 参数指定)。<a href="https://cn.rx.js.org/class/es6/Observable.js~Observable.html#instance-method-retry">官方文档</a></p>
+
+<pre><code class="language-ts">const param = {code:100}
+quest(param)
+    .pipe(
+         retry(2)
+    )
+    .subscribe(log, log,logCompleted) 
+// questing
+// questing 
+// questing
+// error
+</code></pre>
+
+<h3 id="retrywhen">retryWhen</h3>
+
+<pre><code class="language-ts">public retryWhen(notifier: function(errors: Observable): Observable): Observable
+</code></pre>
+
+<p>根据 <code>notifier</code> 返回的 Observable 来决定是否重试，用法和 <code>repeatWhen</code> 类似。<a href="https://cn.rx.js.org/class/es6/Observable.js~Observable.html#instance-method-retryWhen">官方文档</a></p>
+
+<pre><code class="language-ts">let param = {code: 200}
+let flag = false
+quest(param)
+    .pipe(
+        tap(_ =&gt; {
+            if (!flag) throw 'reload'
+        }),
+        retryWhen(err$ =&gt; err$.pipe(
+            takeWhile(err =&gt; {
+              if(err === 'reload'){
+                return true
+              }else
+                throw err
+            }),
+            tap(_ =&gt; {
+                flag = true
+            }),
+        ))
+    )
+    .subscribe(log, log, logCompleted)
+// questing
+// questing
+// ok
+// completed
+</code></pre>
+
+<p>要注意一下的是，一定要清楚上游有哪些 Error ，符合条件的进行 <code>retry</code> 不符合条件的要继续 <code>throw</code>。</p>
+
+<h3 id="catcherror-catch">catchError/catch</h3>
+
+<pre><code class="language-ts">public catch(selector: function): Observable
+</code></pre>
+
+<p>捕获 observable 中的错误，可以通过返回一个新的 observable 或者抛出错误对象来处理。<a href="https://cn.rx.js.org/class/es6/Observable.js~Observable.html#instance-method-catch">官方文档</a></p>
+
+<p><code>selector</code> 函数接受两个参数：</p>
 
 <ul>
-<li><a href="https://jekyllrb.com/">jekyll</a> 使用 ruby 编写 <img src="https://img.shields.io/github/stars/jekyll/jekyll.svg?style=social" alt="GitHub stars" />
-
-<ul>
-<li>优点：github官方集成，老牌工具生态主题多</li>
-<li>缺点：构建较慢</li>
-</ul></li>
-<li><a href="https://hexo.io/">hexo </a> 使用 nodejs 编写 <img src="https://img.shields.io/github/stars/hexojs/hexo.svg?style=social" alt="GitHub stars" />
-
-<ul>
-<li>优点：nodejs 对前端友好，主题较多，构建速度介于 hugo 和 jekyll 之间</li>
-<li>缺点：没有喜欢的主题，看到 <code>node_module</code> 就头大</li>
-</ul></li>
-<li><a href="https://gohugo.io/">hugo</a> 使用 go 编写 <img src="https://img.shields.io/github/stars/gohugoio/hugo.svg?style=social" alt="GitHub stars" />
-
-<ul>
-<li>优点：构建速度快</li>
-<li>缺点：主题少</li>
-</ul></li>
+<li><code>err</code> ，错误对象，</li>
+<li><code>caught</code> ，源 Observable，当你想“重试”的时候返回它即可。</li>
 </ul>
 
-<p>hugo性能好、有喜欢的主题、对go也有兴趣，就选它了，按照官方教程把网站搭好。现在网站还很丑，以后有时间再优化，先完成今天的目标。</p>
+<pre><code class="language-ts">let param = {code: 200}
+let flag = false
+quest(param)
+    .pipe(
+        tap(_ =&gt; {
+            if (!flag) throw 'reload'
+        }),
+        catchError((err,catch$) =&gt; {
+              if(err === 'reload'){
+                flag = true 
+                return catch$
+              }else
+                throw err
+        })
+    )
+    .subscribe(log, log, logCompleted)
+// questing
+// questing
+// ok
+// completed
+</code></pre>
 
-<h2 id="配置-github">配置 github</h2>
+<p>效果和 <code>retryWhen</code> 一样，代码更简单，不需要考虑重试次数时可以考虑。</p>
 
-<ul>
-<li>创建 repository <code>username</code>.github.io</li>
-<li><code>git submodule add {username}.github.io.git public</code></li>
-<li><code>hugo</code></li>
-<li><code>git commit</code></li>
-</ul>
+<h2 id="retry-源码">retry 源码</h2>
 
-<h2 id="配置-travis-自动构建">配置 travis 自动构建</h2>
+<p><code>repeat</code>、<code>repeatWhen</code> 不是重试。<code>retry</code>、<code>retryWhen</code>、<code>catchError</code> 可以对错误重试，想要通过它们实现非错误重试，需要伪造一个 Error 以及额外判断。在非错误的情况下，可以进行重试吗？几经验证，没行得通 <code>this._unsubscribeAndRecycle()</code> 在 <code>_next</code> 函数中使用后，不能正常工作，具体原因未查明。又或者这个方案本身就存在问题，留待以后研究。</p>
 
-<p>待续</p>
+<pre><code class="language-ts">import { Subscriber } from 'rxjs/Subscriber';
 
-<h2 id="hugo配置与美化">hugo配置与美化</h2>
-
-<p>待续</p>
+export function retry(count = -1) {
+   // return this.lift(new RetryOperator(count, this));
+    return function (source) {
+        return source.lift(new RetryOperator(count, source));
+    }
+}
+class RetryOperator {
+    constructor(public count, public source) { }
+    call(subscriber, source) {
+        return source.subscribe(new RetrySubscriber(subscriber, this.count, this.source));
+    }
+}
+class RetrySubscriber extends Subscriber {
+    constructor(destination, public count, public source) {
+        super(destination);
+    }
+    error(err) {
+        if (!this.isStopped) {
+            const { source, count } = this;
+            if (count === 0) {
+                return super.error(err);
+            }
+            else if (count &gt; -1) {
+                this.count = count - 1;
+            }
+            source.subscribe(this._unsubscribeAndRecycle());
+        }
+    }
+}
+</code></pre>
 
 <h2 id="参考链接">参考链接</h2>
 
-<p><a href="https://www.simongong.net/xuan-ze-kun-nan-zheng/">开源静态博客生成器——jekyll、hexo、hugo怎么选？</a></p>
-
-<p><a href="https://stackshare.io/stackups/hexo-vs-hugo_2-vs-jekyll">Jekyll vs. Hugo vs. Hexo</a></p>
-
-<h2 id="一些好看的博客">一些好看的博客</h2>
-
-<p><a href="http://joselynzhao.top/">http://joselynzhao.top/</a></p>
-
-<p><a href="http://blog.yeshuanova.com/">http://blog.yeshuanova.com/</a></p>
-
-<p><a href="https://cythilya.github.io/">https://cythilya.github.io/</a></p>
-
-<p><a href="https://blog.olowolo.com/">https://blog.olowolo.com/</a></p>
+<p><a href="https://cloud.tencent.com/developer/section/1489395">创建操作符 | operator-creation</a></p>
 
     
 	</div>
   <footer class="article-footer clearfix">
   
 
-<div class="article-tags">
-  <span></span>
-  
-  <a href="/tags/hugo">Hugo</a>
-  
-</div>
 
 
 
-
-
-<div class="article-categories">
-  <span></span>
-  
-  <a class="article-category-link" href="/categories/tools">tools</a>
-  
-</div>
 
 
 
   <div class="article-share" id="share">
-    <div data-url="/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/" data-title="用Hugo搭建个人Blog" data-tsina="" class="share clearfix">
+    <div data-url="/post/2019/06/rxjs%E9%87%8D%E8%AF%95/" data-title="RxJS重试之retry、retryWhen、catchError、repeat、repeatWhen" data-tsina="" class="share clearfix">
     </div>
   </div>
 </footer>
@@ -236,8 +379,8 @@
 
 
 var disqus_config = function () {
-this.page.url = "/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/";
-this.page.identifier = "/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/";
+this.page.url = "/post/2019/06/rxjs%E9%87%8D%E8%AF%95/";
+this.page.identifier = "/post/2019/06/rxjs%E9%87%8D%E8%AF%95/";
 };
 (function() { 
 var d = document, s = d.createElement('script');
