@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Even - A super concise theme for Hugo</title>
+    <link>http://localhost:1313/categories/</link>
+    <description>Recent content in Categories on Even - A super concise theme for Hugo</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>zh-cn</language>
+    <lastBuildDate>Mon, 27 May 2019 19:57:56 +0800</lastBuildDate>
+    
+	<atom:link href="http://localhost:1313/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>typescript</title>
+      <link>http://localhost:1313/categories/typescript/</link>
+      <pubDate>Mon, 27 May 2019 19:57:56 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/typescript/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rxjs</title>
+      <link>http://localhost:1313/categories/rxjs/</link>
+      <pubDate>Tue, 14 May 2019 00:06:54 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/rxjs/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tools</title>
+      <link>http://localhost:1313/categories/tools/</link>
+      <pubDate>Sat, 27 Apr 2019 17:41:11 +0800</pubDate>
+      
+      <guid>http://localhost:1313/categories/tools/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
