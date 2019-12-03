@@ -1,0 +1,273 @@
+<!doctype html><html lang=zh-cn><head><meta charset=utf-8><meta http-equiv=x-ua-compatible content="IE=edge,chrome=1"><title>Obervable VS Promise - 农耕记 - 田夫荷锄至，相见语依依</title><meta name=renderer content="webkit"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta http-equiv=cache-control content="no-transform"><meta http-equiv=cache-control content="no-siteapp"><meta name=theme-color content="#f8f5ec"><meta name=msapplication-navbutton-color content="#f8f5ec"><meta name=apple-mobile-web-app-capable content="yes"><meta name=apple-mobile-web-app-status-bar-style content="#f8f5ec"><meta name=author content="fffield"><meta name=description content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv"><meta name=keywords content="前端,JavaScript,TypeScript"><meta name=generator content="Hugo 0.59.1 with theme even"><link rel=canonical href=http://localhost:1313/post/2019/05/observable-promise/><link rel=apple-touch-icon sizes=180x180 href=/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=/favicon-32x32.png><link rel=icon type=image/png sizes=16x16 href=/favicon-16x16.png><link rel=manifest href=/manifest.json><link rel=mask-icon href=/safari-pinned-tab.svg color=#5bbad5><link href=/dist/even.c2a46f00.min.css rel=stylesheet><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin=anonymous><meta property="og:title" content="Obervable VS Promise"><meta property="og:description" content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv"><meta property="og:type" content="article"><meta property="og:url" content="http://localhost:1313/post/2019/05/observable-promise/"><meta property="article:published_time" content="2019-05-14T00:06:54+08:00"><meta property="article:modified_time" content="2019-05-14T00:06:54+08:00"><meta itemprop=name content="Obervable VS Promise"><meta itemprop=description content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv"><meta itemprop=datePublished content="2019-05-14T00:06:54&#43;08:00"><meta itemprop=dateModified content="2019-05-14T00:06:54&#43;08:00"><meta itemprop=wordCount content="1094"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="Obervable VS Promise"><meta name=twitter:description content="入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Oberv"><!--[if lte IE 9]><script src=https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js></script><![endif]--><!--[if lt IE 9]><script src=https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js></script><script src=https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js></script><![endif]--></head><body><div id=mobile-navbar class=mobile-navbar><div class=mobile-header-logo><a href=/ class=logo>农耕记</a></div><div class=mobile-navbar-icon><span></span><span></span><span></span></div></div><nav id=mobile-menu class="mobile-menu slideout-menu"><ul class=mobile-menu-list><a href=/><li class=mobile-menu-item>首页</li></a><a href=/tags/><li class=mobile-menu-item>标签</li></a><a href=/categories/><li class=mobile-menu-item>分类</li></a></ul></nav><div class=container id=mobile-panel><header id=header class=header><div class=logo-wrapper><a href=/ class=logo>农耕记</a></div><nav class=site-navbar><ul id=menu class=menu><li class=menu-item><a class=menu-item-link href=/>首页</a></li><li class=menu-item><a class=menu-item-link href=/tags/>标签</a></li><li class=menu-item><a class=menu-item-link href=/categories/>分类</a></li></ul></nav></header><main id=main class=main><div class=content-wrapper><div id=content class=content><article class=post><header class=post-header><h1 class=post-title>Obervable VS Promise</h1><div class=post-meta><span class=post-time>2019-05-14</span><div class=post-category><a href=/categories/rxjs/>rxjs</a></div></div></header><div class=post-toc id=post-toc><h2 class=post-toc-title>文章目录</h2><div class="post-toc-content always-active"><nav id=TableOfContents><ul><li><ul><li><a href=#obervable-懒执行-promise-立即执行>Obervable 懒执行 Promise 立即执行</a></li><li><a href=#obervable-可能同步-promise-一直异步>Obervable 可能同步 Promise 一直异步</a></li><li><a href=#observable-数据流-与-promise-一个承诺>Observable 数据流 与 Promise 一个承诺</a></li><li><a href=#observable-可取消-与-promise-不可取消>Observable 可取消 与 Promise 不可取消</a></li><li><a href=#其他>其他</a><ul><li><a href=#错误处理>错误处理</a></li><li><a href=#finally>finally</a></li></ul></li><li><a href=#总结>总结</a></li></ul></li></ul></nav></div></div><div class=post-content><blockquote><p>入坑 Angular 之后，一直在使用 RxJS来处理异步。尽管性能尚未考究，但是在逐渐熟悉 RxJS 的操作符之后，使用体验非常棒。现在将 RxJS 中的可观察对象（Obervable）与之前一直使用 Promise 进行一些比较。</p></blockquote><p>Obervable 和 Promise 都是进行异步处理的利器，本文将两者的差异进行比较，以巩固两边的知识点。</p><h2 id=obervable-懒执行-promise-立即执行>Obervable 懒执行 Promise 立即执行</h2><p>从创建 Obervable 和 Promise 开始，两者就有差异。前者每次订阅时执行 subscribe 函数，后者创建实例时执行 executor 函数 。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=c1>// init promise
+</span><span class=c1></span><span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>resolve</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;init promise&#39;</span><span class=p>)</span>
+    <span class=nx>resolve</span><span class=p>(</span><span class=mi>7</span><span class=p>);</span>
+<span class=p>})</span>
+<span class=c1>// 7
+</span><span class=c1>// 7 
+</span><span class=c1></span><span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>promise</span><span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+    <span class=nx>promise</span><span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+<span class=p>},</span> <span class=mi>2000</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>observable$</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Observable</span><span class=p>(</span><span class=nx>observer</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;init observable&#39;</span><span class=p>)</span>
+    <span class=nx>observer</span><span class=p>.</span><span class=nx>next</span><span class=p>(</span><span class=mi>7</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=c1>// init observable
+</span><span class=c1>// 7
+</span><span class=c1>// init observable
+</span><span class=c1>// 7
+</span><span class=c1></span><span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>observable$</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+    <span class=nx>observable$</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+<span class=p>},</span> <span class=mi>2000</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><h2 id=obervable-可能同步-promise-一直异步>Obervable 可能同步 Promise 一直异步</h2><p>Obervable 在 subscribe 函数执行过程中如果有值被 <code>next</code> 出来，后续的订阅将会同步执行。Promise 则不回，它是<strong>异步</strong>任务的一种。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=c1>// before observable.
+</span><span class=c1>// 7
+</span><span class=c1>// after observable.
+</span><span class=c1></span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;before observable.&#39;</span><span class=p>)</span>
+<span class=kr>const</span> <span class=nx>observable$</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Observable</span><span class=p>(</span><span class=nx>observer</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>observer</span><span class=p>.</span><span class=nx>next</span><span class=p>(</span><span class=mi>7</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=nx>observable$</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;after observable.&#39;</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=c1>// before promise.
+</span><span class=c1>// after promise.
+</span><span class=c1>// 1
+</span><span class=c1></span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;before promise.&#39;</span><span class=p>)</span>
+<span class=kr>const</span> <span class=nx>promise</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>resolve</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>resolve</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=nx>promise</span><span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>res</span><span class=p>))</span>
+<span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;after promise.&#39;</span><span class=p>)</span>
+</code></pre></td></tr></table></div></div><p>不过 Promise 配合上 <code>async</code> <code>await</code> 也可以模拟同步，但 Promise 本身是一种<strong>微任务</strong>。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kd>function</span> <span class=nx>somePromise</span><span class=p>()</span> <span class=p>{</span>
+  <span class=k>return</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>resolve</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+      <span class=nx>resolve</span><span class=p>(</span><span class=s1>&#39;resolved&#39;</span><span class=p>);</span>
+    <span class=p>},</span> <span class=mi>2000</span><span class=p>);</span>
+  <span class=p>});</span>
+<span class=p>}</span>
+
+<span class=nx>async</span> <span class=kd>function</span> <span class=nx>asyncCall</span><span class=p>()</span> <span class=p>{</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;calling&#39;</span><span class=p>);</span>
+  <span class=kd>var</span> <span class=nx>result</span> <span class=o>=</span> <span class=nx>await</span> <span class=nx>somePromise</span><span class=p>();</span>
+  <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>);</span>
+<span class=p>}</span>
+<span class=c1>// calling
+</span><span class=c1>// resolved
+</span><span class=c1></span><span class=nx>asyncCall</span><span class=p>();</span>
+</code></pre></td></tr></table></div></div><h2 id=observable-数据流-与-promise-一个承诺>Observable 数据流 与 Promise 一个承诺</h2><p>Observable 会向订阅者持续不断的输出最新值，Promise <code>resolve()</code>之后不会再改变它的值。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>observable$</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Observable</span><span class=p>(</span><span class=nx>observer</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span>
+    <span class=kr>const</span> <span class=nx>handle</span> <span class=o>=</span> <span class=nx>setInterval</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+        <span class=nx>i</span><span class=o>++</span>
+        <span class=nx>observer</span><span class=p>.</span><span class=nx>next</span><span class=p>(</span><span class=nx>i</span><span class=p>)</span>
+        <span class=k>if</span> <span class=p>(</span><span class=nx>i</span> <span class=o>&gt;=</span> <span class=mi>3</span><span class=p>)</span> <span class=nx>clearInterval</span><span class=p>(</span><span class=nx>handle</span><span class=p>)</span>
+    <span class=p>},</span> <span class=mi>1000</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=c1>// 1
+</span><span class=c1>// 2
+</span><span class=c1>// 3
+</span><span class=c1></span><span class=nx>observable$</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>promise</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>resolve</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>resolve</span><span class=p>(</span><span class=mi>7</span><span class=p>);</span>
+    <span class=nx>resolve</span><span class=p>(</span><span class=mi>9</span><span class=p>);</span>
+<span class=p>})</span>
+<span class=c1>// 7 
+</span><span class=c1></span><span class=nx>promise</span><span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+</code></pre></td></tr></table></div></div><p>因为 Observable 会源源不断提供新的值，所以在不需要获取新值的时候一定要<strong>取消订阅</strong></p><h2 id=observable-可取消-与-promise-不可取消>Observable 可取消 与 Promise 不可取消</h2><p>原生的 Promise 未提供取消的 API。在现在这种大量使用组件化的时代，这点确实挺不方便的。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>observable$</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Observable</span><span class=p>(</span><span class=nx>observer</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=kd>let</span> <span class=nx>i</span> <span class=o>=</span> <span class=mi>0</span>
+    <span class=kr>const</span> <span class=nx>handle</span> <span class=o>=</span> <span class=nx>setInterval</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+        <span class=nx>i</span><span class=o>++</span>
+        <span class=nx>observer</span><span class=p>.</span><span class=nx>next</span><span class=p>(</span><span class=nx>i</span><span class=p>)</span>
+        <span class=k>if</span> <span class=p>(</span><span class=nx>i</span> <span class=o>&gt;=</span> <span class=mi>3</span><span class=p>)</span> <span class=nx>clearInterval</span><span class=p>(</span><span class=nx>handle</span><span class=p>)</span>
+    <span class=p>},</span> <span class=mi>1000</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=kr>const</span> <span class=nx>subscription</span> <span class=o>=</span> <span class=nx>observable$</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span><span class=nx>num</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>num</span><span class=p>))</span>
+<span class=c1>// 1
+</span><span class=c1></span><span class=nx>setTimeout</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+    <span class=nx>subscription</span><span class=p>.</span><span class=nx>unsubscribe</span><span class=p>();</span>
+<span class=p>},</span> <span class=mi>1500</span><span class=p>);</span>
+</code></pre></td></tr></table></div></div><p>Promise <code>then()</code> 返回一个 Promise ，可以链式操作对结果进行一些加工。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>promise</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>resolve</span> <span class=p>=&gt;</span> <span class=nx>resolve</span><span class=p>(</span><span class=mi>1</span><span class=p>))</span>
+<span class=kr>const</span> <span class=nx>promiseThen</span> <span class=o>=</span> <span class=nx>promise</span><span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>result</span> <span class=p>=&gt;</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>result</span><span class=p>))</span>
+<span class=c1>//true
+</span><span class=c1></span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>promiseThen</span> <span class=k>instanceof</span> <span class=nb>Promise</span><span class=p>)</span>
+
+<span class=kr>const</span> <span class=nx>promise1</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>res</span><span class=p>=&gt;{</span>
+	<span class=nx>res</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span><span class=mi>2</span><span class=p>,</span><span class=mi>3</span><span class=p>])</span>
+<span class=p>})</span>
+<span class=c1>// [4,6]
+</span><span class=c1></span><span class=nx>promise1</span>
+	<span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span><span class=p>=&gt;</span><span class=nx>res</span><span class=p>.</span><span class=nx>filter</span><span class=p>(</span><span class=nx>item</span><span class=p>=&gt;</span><span class=nx>item</span><span class=o>&gt;</span><span class=mi>1</span><span class=p>))</span>
+  <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span><span class=p>=&gt;</span><span class=nx>res</span><span class=p>.</span><span class=nx>map</span><span class=p>(</span><span class=nx>item</span><span class=p>=&gt;</span><span class=nx>item</span><span class=o>*</span><span class=mi>2</span><span class=p>))</span>
+  <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>res</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>res</span><span class=p>))</span>
+</code></pre></td></tr></table></div></div><h2 id=其他>其他</h2><h3 id=错误处理>错误处理</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>promise1</span> <span class=o>=</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>(</span><span class=nx>res</span><span class=p>=&gt;{</span>
+	<span class=k>throw</span> <span class=k>new</span> <span class=nb>Error</span><span class=p>(</span><span class=s1>&#39;出错了&#39;</span><span class=p>)</span>
+<span class=p>})</span>
+<span class=nx>promise1</span><span class=p>.</span><span class=nx>then</span><span class=p>().</span><span class=k>catch</span><span class=p>(</span><span class=nx>err</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>err</span><span class=p>))</span>
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kr>const</span> <span class=nx>bs</span><span class=o>=</span><span class=k>new</span> <span class=nx>Rx</span><span class=p>.</span><span class=nx>BehaviorSubject</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+<span class=kr>const</span> <span class=nx>obs</span><span class=o>=</span><span class=nx>bs</span><span class=p>.</span><span class=nx>asObservable</span><span class=p>()</span>
+<span class=nx>obs</span><span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span>
+	<span class=nx>res</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>res</span><span class=p>),</span>
+	<span class=nx>err</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+<span class=p>)</span>
+<span class=nx>bs</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=s1>&#39;出错了&#39;</span><span class=p>)</span> <span class=c1>//subscribe将会结束
+</span></code></pre></td></tr></table></div></div><h3 id=finally>finally</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=nx>promise</span>
+<span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>result</span> <span class=p>=&gt;</span> <span class=p>{</span>
+  <span class=c1>//···
+</span><span class=c1></span><span class=p>})</span>
+<span class=p>.</span><span class=k>catch</span><span class=p>(</span><span class=nx>error</span> <span class=p>=&gt;</span> <span class=p>{</span>
+  <span class=c1>//···
+</span><span class=c1></span><span class=p>})</span>
+<span class=p>.</span><span class=k>finally</span><span class=p>(()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+  <span class=c1>//···
+</span><span class=c1></span><span class=p>});</span>
+</code></pre></td></tr></table></div></div><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre class=chroma><code class=language-javascript data-lang=javascript><span class=kd>var</span> <span class=nx>obs</span> <span class=o>=</span> <span class=nx>Rx</span><span class=p>.</span><span class=nx>Observable</span><span class=p>.</span><span class=k>of</span><span class=p>(</span><span class=mi>1</span><span class=p>)</span>
+  <span class=p>.</span><span class=k>finally</span><span class=p>(</span><span class=kd>function</span> <span class=p>()</span> <span class=p>{</span> <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=s1>&#39;Finally&#39;</span><span class=p>);</span> <span class=p>});</span> <span class=c1>//completed才会执行finally
+</span><span class=c1></span>  
+<span class=nx>obs</span>
+<span class=p>.</span><span class=nx>subscribe</span><span class=p>(</span>
+	<span class=nx>res</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=nx>res</span><span class=p>),</span>
+	<span class=nx>err</span><span class=p>=&gt;</span><span class=nx>console</span><span class=p>.</span><span class=nx>error</span><span class=p>(</span><span class=nx>err</span><span class=p>)</span>
+<span class=p>)</span>
+</code></pre></td></tr></table></div></div><h2 id=总结>总结</h2><p>根据笔者自己的使用体验，RxJS 有强大的操作符，语义表达很好，写出来的代码可读性很强。Promise 原生支持，微任务的执行机制不会影响主线程，不能 cancellable 用起来就挺不方便了。抛开原生异步任务这点不说，Promise 能干的 RxJS 都能干，大部分的异步场景推荐 RxJS 。</p></div><div class=post-copyright><p class=copyright-item><span class=item-title>文章作者</span>
+<span class=item-content>fffield</span></p><p class=copyright-item><span class=item-title>上次更新</span>
+<span class=item-content>2019-05-14</span></p></div><footer class=post-footer><nav class=post-nav><a class=prev href=/post/2019/05/%E7%86%9F%E7%BB%83%E6%8E%8C%E6%8F%A1typescript01/><i class="iconfont icon-left"></i><span class="prev-text nav-default">熟练掌握 Typescript（一） 前言</span>
+<span class="prev-text nav-mobile">上一篇</span></a>
+<a class=next href=/post/2019/04/%E7%94%A8hugo%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BAblog/><span class="next-text nav-default">用Hugo搭建个人Blog</span>
+<span class="next-text nav-mobile">下一篇</span>
+<i class="iconfont icon-right"></i></a></nav></footer></article></div><script src=https://utteranc.es/client.js repo=fffield/blog-comment issue-term=pathname theme=github-light crossorigin=anonymous async></script><noscript>Please enable JavaScript to view the <a href=https://github.com/utterance>comments powered by utterances.</a></noscript></div></main><footer id=footer class=footer><div class=social-links><a href=https://github.com/fffield class="iconfont icon-github" title=github></a><a href=http://localhost:1313/index.xml type=application/rss+xml class="iconfont icon-rss" title=rss></a></div><div class=copyright><span class=power-by>由 <a class=hexo-link href=https://gohugo.io>Hugo</a> 强力驱动</span>
+<span class=division>|</span>
+<span class=theme-info>主题 -
+<a class=theme-link href=https://github.com/olOwOlo/hugo-theme-even>Even</a></span>
+<span class=copyright-year>&copy;
+2019
+<span class=heart><i class="iconfont icon-heart"></i></span><span class=author>fffield</span></span></div></footer><div class=back-to-top id=back-to-top><i class="iconfont icon-up"></i></div></div><script src=https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin=anonymous></script><script src=https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin=anonymous></script><script type=text/javascript src=/dist/even.26188efa.min.js></script><script id=baidu_analytics>var _hmt=_hmt||[];(function(){if(window.location.hostname==='localhost')return;var hm=document.createElement("script");hm.async=true;hm.src="https://hm.baidu.com/hm.js?70e8e68949c95ddf3a4f289e644f161b";var s=document.getElementsByTagName("script")[0];s.parentNode.insertBefore(hm,s);})();</script></body></html>
